@@ -4,7 +4,7 @@
   "description": "<!-- Don't delete it --> <div name=\"readme-top\"></div>",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "build": "tsc --module NodeNext --moduleResolution NodeNext",
     "start": "node --experimental-modules dist/index.js",
     "dev": "ts-node --esm src/index.ts"
@@ -27,7 +27,10 @@
     "ethers": "^6.16.0"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^25.5.0",
+    "jest": "^30.3.0",
+    "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.2"
   }

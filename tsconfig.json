@@ -23,6 +23,7 @@
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
+    "types": ["node", "jest"],
 
     // Style Options
     // "noImplicitReturns": true,

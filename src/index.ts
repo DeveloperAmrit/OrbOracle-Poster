@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import axios from "axios";
 import * as dotenv from "dotenv";
 import { OracleAbi, ChainlinkAggregatorAbi } from "./abi.js";
+import { calculateMedianAndNormalize } from "./aggregator.js";
 
 dotenv.config();
 
@@ -30,7 +31,6 @@ const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
 // We cast to any to bypass strict typechecking on the un-typed ABI interface
 const oracleContract = new ethers.Contract(ORACLE_ADDRESS, OracleAbi, wallet) as any;
 
-// ... [rest of file starting at Data fetching strategies] ...
 // Data fetching strategies
 async function fetchCoinGeckoPrice(): Promise<number | null> {
     try {
@@ -85,23 +85,9 @@ async function fetchAndNormalizePrice(): Promise<bigint> {
         fetchPythPrice()
     ]);
 
-    const validPrices = [coingeckoPrice, chainlinkPrice, pythPrice].filter((p): p is number => p !== null && !isNaN(p));
-
-    if (validPrices.length === 0) {
-        throw new Error("All data sources failed to return a valid price.");
-    }
-
-    // Median aggregation
-    validPrices.sort((a, b) => a - b);
-    const mid = Math.floor(validPrices.length / 2);
-    const medianPrice = validPrices.length % 2 !== 0 
-        ? validPrices[mid]! 
-        : (validPrices[mid - 1]! + validPrices[mid]!) / 2;
-
-    console.log(`[Aggregation] Calculated Median Price: $${medianPrice} from ${validPrices.length} sources.`);
-
-    // Convert to BigInt scaled up by 1e8 for precise integer arithmetic
-    const normalizedPrice = BigInt(Math.floor(medianPrice * 1e8));
+    const normalizedPrice = calculateMedianAndNormalize([coingeckoPrice, chainlinkPrice, pythPrice]);
+    console.log(`[Aggregation] Calculated and Normalized Median Price.`);
+    
     return normalizedPrice;
 }
 
