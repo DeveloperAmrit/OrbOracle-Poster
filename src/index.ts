@@ -95,7 +95,9 @@ async function fetchAndNormalizePrice(): Promise<bigint> {
 // Stake Verification
 async function verifyStake(): Promise<boolean> {
     try {
-        const totalStake: bigint = await oracleContract.getTotalUserTokens(wallet.address);
+        const locked: bigint = await oracleContract.lockedTokens(wallet.address);
+        const unlocked: bigint = await oracleContract.unlockedTokens(wallet.address);
+        const totalStake = locked + unlocked;
         console.log(`[Stake Verifier] Current stake: ${ethers.formatUnits(totalStake, 18)} Tokens`);
         return totalStake >= MIN_STAKE_REQUIRED;
     } catch (error) {
